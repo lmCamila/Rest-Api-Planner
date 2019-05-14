@@ -11,25 +11,25 @@ namespace PlanRestApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TypePlanController : ControllerBase
+    public class PlanStatusController : ControllerBase
     {
-        private readonly TypePlanRepository _typePlanRepository;
-        public TypePlanController(IConfiguration configuration)
+        private readonly PlanStatusRepository _planStatusRepository;
+        public PlanStatusController(IConfiguration configuration)
         {
-            _typePlanRepository = new TypePlanRepository(configuration);
+            _planStatusRepository = new PlanStatusRepository(configuration);
         }
 
         [HttpGet]
         public IActionResult GetAll()
         {
-            var list = _typePlanRepository.GetAll();
+            var list = _planStatusRepository.GetAll();
             return Ok(list);
         }
 
         [HttpGet("{id}")]
         public IActionResult Get([FromRoute] int id)
         {
-            var model = _typePlanRepository.Get(id);
+            var model = _planStatusRepository.Get(id);
             if(model == null)
             {
                 return NotFound();
@@ -38,24 +38,24 @@ namespace PlanRestApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult Insert([Bind("Name")]TypePlan type)
+        public IActionResult Insert([Bind("Name")] PlanStatus status)
         {
             if (ModelState.IsValid)
             {
-                var result = _typePlanRepository.Insert(type);
-                var lastType = result ? _typePlanRepository.GetLastInserted() : null;
-                var uri = Url.Action("Get", new { id = lastType.Id });
-                return Created(uri, lastType);
+                var result = _planStatusRepository.Insert(status);
+                var lastPlan = result ? _planStatusRepository.GetLastInserted() : null;
+                var uri = Url.Action("Get", new { Id = lastPlan.Id });
+                return Created(uri, lastPlan);
             }
             return BadRequest();
         }
 
         [HttpPut]
-        public IActionResult Update([Bind("Id,Name")]TypePlan type)
+        public IActionResult Update([Bind("Id,Name")] PlanStatus status)
         {
             if (ModelState.IsValid)
             {
-                _typePlanRepository.Update(type);
+                _planStatusRepository.Update(status);
                 return Ok();
             }
             return BadRequest();
@@ -64,12 +64,12 @@ namespace PlanRestApi.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var model = _typePlanRepository.Get(id);
+            var model = _planStatusRepository.Get(id);
             if(model == null)
             {
                 return NotFound();
             }
-            _typePlanRepository.Delete(id);
+            _planStatusRepository.Delete(id);
             return NoContent();
         }
     }
