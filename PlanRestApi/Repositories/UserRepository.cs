@@ -15,6 +15,7 @@ namespace PlanRestApi.Repositories
         public UserRepository(IConfiguration configuration) : base(configuration) { }
         public override bool Delete(int id)
         {
+            //adequar ao banco e fazer um update na variável removed e mudar o get all tbm 
             using (IDbConnection db = new SqlConnection(ConnectionString))
             {
                 if (db.State == ConnectionState.Closed)
