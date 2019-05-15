@@ -15,14 +15,15 @@ namespace PlanRestApi.Repositories
         public UserRepository(IConfiguration configuration) : base(configuration) { }
         public override bool Delete(int id)
         {
-            //adequar ao banco e fazer um update na variável removed e mudar o get all tbm 
             using (IDbConnection db = new SqlConnection(ConnectionString))
             {
                 if (db.State == ConnectionState.Closed)
                 {
                     db.Open();
                 }
-                int result = db.Execute("DELETE FROM users WHERE id = @Id", 
+                int result = db.Execute(@"UPDATE  users 
+                                       SET removed = 1
+                                       WHERE id = @Id", 
                                                 new { Id = id }, 
                                                 commandType: CommandType.Text);
                 return (result > 0);
@@ -52,7 +53,7 @@ namespace PlanRestApi.Repositories
                 {
                     db.Open();
                 }
-                IEnumerable<User> user = db.Query<User>("SELECT * FROM users");
+                IEnumerable<User> user = db.Query<User>("SELECT * FROM users WHERE removed = 0");
                 return (List<User>)user;
             }
         }

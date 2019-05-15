@@ -9,10 +9,27 @@ namespace PlanRestApi.Models
     public class UserHistory
     {
         public int Id { get; set; }
-        public User User { get; set; }
         public byte Status { get; set; }
         public byte CreateNewPlan { get; set; }
         public DateTime Date { get; set; }
+        public int IdUser { get; set; }
     }
-  
+
+    public class UserHistoryConfig
+    {
+        public User User { get; set; }
+        public List<UserHistory> History { get; set; }
+    }
+
+    public static class UserHistoryConfigExtensions
+    {
+        public static UserHistoryConfig ToUserHistoryConfig(this IEnumerable<UserHistory> query, User user)
+        {
+            return new UserHistoryConfig
+            {
+                User = user,
+                History = query.ToList()
+            };
+        }
+    }
 }

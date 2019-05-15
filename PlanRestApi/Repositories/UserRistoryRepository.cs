@@ -20,22 +20,7 @@ namespace PlanRestApi.Repositories
 
         public override UserHistory Get(int idUser)
         {
-            using(IDbConnection db =  new SqlConnection(ConnectionString))
-            {
-                if(db.State == ConnectionState.Closed)
-                {
-                    db.Open();
-                }
-                var query = db.Query<UserHistory, User, UserHistory>(@"SELECT uh.*, u.*
-                            FROM users_history uh INNER JOIN users u ON uh.id_user = u.id 
-                            WHERE uh.id_user =@Id",
-                             (uh, u) =>
-                             {
-                                 uh.User = u;
-                                 return uh;
-                             }, new { Id = idUser }, splitOn: "id,id").AsList();
-                return query[0];
-            }
+            throw new Exception("Não aplicavel a histórico de usuários.");            
         }
 
         public override IEnumerable<UserHistory> GetAll()
@@ -47,13 +32,9 @@ namespace PlanRestApi.Repositories
                 {
                     db.Open();
                 }
-                var query = db.Query<UserHistory, User, UserHistory>(@"SELECT uh.*, u.*
-                            FROM users_history uh INNER JOIN users u ON uh.id_user = u.id ",
-                            (uh, u) =>
-                            {
-                                uh.User = u;
-                                return uh;
-                            }, null, splitOn: "id,id").AsList();
+                var query = db.Query<UserHistory>(@"SELECT uh.*
+                                                    FROM users_history uh 
+                                                    INNER JOIN users u ON uh.id_user = u.id ").AsList();
                 return (List<UserHistory>)query;
             }
         }
@@ -67,14 +48,9 @@ namespace PlanRestApi.Repositories
                 {
                     db.Open();
                 }
-                var query = db.Query<UserHistory, User, UserHistory>(@"SELECT uh.*, u.*
+                var query = db.Query<UserHistory>(@"SELECT uh.*
                             FROM users_history uh INNER JOIN users u ON uh.id_user = u.id 
-                            WHERE uh.id_user = @Id",
-                            (uh, u) =>
-                            {
-                                uh.User = u;
-                                return uh;
-                            }, new { Id = idUser }, splitOn: "id,id").AsList();
+                            WHERE uh.id_user = @Id", new { Id = idUser }).AsList();
                 return (List<UserHistory>)query;
             }
         }
