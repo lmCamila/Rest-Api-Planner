@@ -23,12 +23,12 @@ namespace PlanRestApi.Models
 
     public static class UserHistoryConfigExtensions
     {
-        public static UserHistoryConfig ToUserHistoryConfig(this IEnumerable<UserHistory> query, User user)
+        public static UserHistoryConfig ToUserHistoryConfig(this IEnumerable<UserHistory> history, User user)
         {
             return new UserHistoryConfig
             {
                 User = user,
-                History = query.ToList()
+                History = history.ToList()
             };
         }
     }
