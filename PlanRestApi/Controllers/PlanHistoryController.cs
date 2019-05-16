@@ -15,42 +15,44 @@ namespace PlanRestApi.Controllers
     [ApiVersion("1.0")]
     [ApiExplorerSettings(GroupName = "v1")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    public class UserHistoryController : Controller
+
+    public class PlanHistoryController : Controller
     {
-        private readonly UserHistoryRepository _uhRepository;
-        private readonly UserRepository _userRepository;
-        public UserHistoryController(IConfiguration configuration)
+        private readonly PlanHistoryRepository _phRepository;
+        private readonly PlanRepository _planRepository;
+        public PlanHistoryController(IConfiguration configuration)
         {
-            _uhRepository = new UserHistoryRepository(configuration);
-            _userRepository = new UserRepository(configuration);
+            _phRepository = new PlanHistoryRepository(configuration);
+            _planRepository = new PlanRepository(configuration);
         }
 
         [HttpGet]
-        [SwaggerOperation(Summary = "Recupera TODOS os históricos de TODOS os usuários",
-                          Tags =new[] {"UserHistory"},
-                          Produces = new[] {"application/json"})]
-        [ProducesResponseType(statusCode: 200, Type = typeof(List<UserHistory>))]
+        [SwaggerOperation(Summary = "Recupera TODOS os históricos de TODOS os planos",
+                          Tags = new[] { "PlanHistory" },
+                          Produces = new[] { "application/json" })]
+        [ProducesResponseType(statusCode: 200, Type = typeof(List<PlanHistory>))]
         [ProducesResponseType(statusCode: 500, Type = typeof(ErrorResponse))]
         [ProducesResponseType(statusCode: 404)]
         public IActionResult GetAll()
         {
-            var model = _uhRepository.GetAll();
+            var model = _phRepository.GetAll();
             if(model == null)
             {
                 return NotFound();
             }
             return Ok(model);
         }
+
         [HttpGet("{id}")]
-        [SwaggerOperation(Summary = "Recupera o histórico de um usuário identificado por seu {id}",
-                          Tags = new[] { "UserHistory" },
+        [SwaggerOperation(Summary = "Recupera o histórico de um plano identificado por seu {id}",
+                          Tags = new[] { "PlanHistory" },
                           Produces = new[] { "application/json" })]
-        [ProducesResponseType(statusCode: 200, Type = typeof(List<UserHistoryConfig>))]
+        [ProducesResponseType(statusCode: 200, Type = typeof(List<PlanHistoryConfig>))]
         [ProducesResponseType(statusCode: 500, Type = typeof(ErrorResponse))]
         [ProducesResponseType(statusCode: 404)]
-        public IActionResult Get([FromRoute][SwaggerParameter("Id do usuário do qual será obtido o histórico")]int id)
+        public IActionResult Get([FromRoute][SwaggerParameter("Id do plano do qual será obtido o histórico")] int id)
         {
-            var model = _uhRepository.GetAll(id).Select(l => l).ToUserHistoryConfig(_userRepository.Get(id));
+            var model = _phRepository.GetAll(id).Select(l => l).ToPlanHistoryConfig(_planRepository.Get(id));
             if(model == null)
             {
                 return NotFound();

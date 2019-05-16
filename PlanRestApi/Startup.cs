@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PlanRestApi.Documentation;
+using PlanRestApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace PlanRestApi
@@ -26,12 +28,22 @@ namespace PlanRestApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc( options => {
+                options.Filters.Add(typeof(ErrorResponseFilter));
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-           // services.AddSwaggerGen(c =>
-           //{
-           //    c.SwaggerDoc("v1", new Info { Title = "Documentação api Planner", Version = "v1" });
-           //});
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
+
+            services.AddApiVersioning();
+            services.AddSwaggerGen(c =>
+           {
+               c.SwaggerDoc("v1", new Info { Title = "Documentação api Planner", Version = "1.0" });
+               c.EnableAnnotations();
+               c.DocumentFilter<TagDescriptionDocumentFilter>();
+           });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,11 +62,12 @@ namespace PlanRestApi
             app.UseHttpsRedirection();
             app.UseMvc();
 
-            //app.UseSwagger();
-            //app.UseSwaggerUI( opt =>
-            //{
-            //    opt.SwaggerEndpoint("/swagger/v1/swagger.json", "API Planner v1");
-            //});
+            app.UseSwagger();
+            app.UseSwaggerUI( opt =>
+            {
+                opt.SwaggerEndpoint("/swagger/v1/swagger.json", "API Planner v1");
+                opt.RoutePrefix = string.Empty;
+            });
         }
     }
 }

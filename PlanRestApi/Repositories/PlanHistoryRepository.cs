@@ -25,7 +25,23 @@ namespace PlanRestApi.Repositories
 
         public override IEnumerable<PlanHistory> GetAll()
         {
-            throw new NotImplementedException();
+            using(IDbConnection db = new SqlConnection(ConnectionString))
+            {
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                if(db.State == ConnectionState.Closed)
+                {
+                    db.Open();
+                }
+                var query = db.Query<PlanHistory,PlanStatus,PlanHistory>(@"SELECT ph.*, ps.* 
+                                                    FROM plans_history ph INNER JOIN plan_status ps
+                                                    ON ph.id_plan_status = ps.id"
+                ,(ph,ps) =>
+                {
+                    ph.Status = ps;
+                    return ph;
+                }, null, splitOn:"id,id").AsList();
+                return (List<PlanHistory>)query;
+            }
         }
 
         public IEnumerable<PlanHistory> GetAll(int idPlan)
@@ -37,9 +53,15 @@ namespace PlanRestApi.Repositories
                 {
                     db.Open();
                 }
-                var query = db.Query<PlanHistory>(@"SELECT * FROM plans_history ph INNER JOIN plan_status ps
+                var query = db.Query<PlanHistory, PlanStatus, PlanHistory>(@"SELECT ph.*, ps.* 
+                                                    FROM plans_history ph INNER JOIN plan_status ps
                                                     ON ph.id_plan_status = ps.id
-                                                    WHERE id_plan = @Id", new { Id = idPlan }).AsList();
+                                                    WHERE id_plan = @Id"
+                ,(ph, ps) => 
+                {
+                    ph.Status = ps;
+                    return ph;
+                }, new { Id = idPlan },splitOn:"id,id").AsList();
                 return (List<PlanHistory>) query;
             }
         }

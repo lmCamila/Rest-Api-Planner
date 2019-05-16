@@ -6,11 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using PlanRestApi.Models;
 using PlanRestApi.Repositories;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace PlanRestApi.Controllers
 {
+    [Produces("application/json")]
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [ApiExplorerSettings(GroupName = "v1")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class UserController : ControllerBase
     {
         private readonly UserRepository _userRepository;
@@ -20,6 +24,12 @@ namespace PlanRestApi.Controllers
         }
 
         [HttpGet]
+        [SwaggerOperation(Summary = "Recupera TODOS os Usuários.",
+                          Tags = new[] { "User" },
+                          Produces = new[] { "application/json" })]
+        [ProducesResponseType(statusCode: 200, Type = typeof(List<User>))]
+        [ProducesResponseType(statusCode: 500, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(statusCode: 404)]
         public IActionResult GetAll()
         {
             var list = _userRepository.GetAll();
@@ -27,7 +37,13 @@ namespace PlanRestApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get([FromRoute]int id)
+        [SwaggerOperation(Summary = "Recupera um usuário identificado por seu {id}.",
+                          Tags = new[] { "User" },
+                          Produces = new[] { "application/json" })]
+        [ProducesResponseType(statusCode: 200, Type = typeof(User))]
+        [ProducesResponseType(statusCode: 500, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(statusCode: 404)]
+        public IActionResult Get([FromRoute][SwaggerParameter("Id do usuário que será obtido.")] int id)
         {
             var model = _userRepository.Get(id);
             if(model == null)
@@ -38,6 +54,12 @@ namespace PlanRestApi.Controllers
         }
 
         [HttpPost]
+        [SwaggerOperation(Summary = "Insere um novo usuário..",
+                          Tags = new[] { "User" },
+                          Produces = new[] { "application/json" })]
+        [ProducesResponseType(statusCode: 201, Type = typeof(User))]
+        [ProducesResponseType(statusCode: 500, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(statusCode: 400)]
         public IActionResult Insert([Bind("Name")] User user)
         {
             if (ModelState.IsValid)
@@ -51,6 +73,11 @@ namespace PlanRestApi.Controllers
         }
 
         [HttpPut]
+        [SwaggerOperation(Summary = "Altera um usuário.",
+                          Tags = new[] { "User" })]
+        [ProducesResponseType(statusCode: 200)]
+        [ProducesResponseType(statusCode: 500, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(statusCode: 400)]
         public IActionResult Update([Bind("Id,Name")] User user)
         {
             if (ModelState.IsValid)
@@ -62,6 +89,11 @@ namespace PlanRestApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [SwaggerOperation(Summary = "Exclui um usuário.",
+                          Tags = new[] { "User" })]
+        [ProducesResponseType(statusCode: 204)]
+        [ProducesResponseType(statusCode: 500, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(statusCode: 404)]
         public IActionResult Delete([FromRoute]int id)
         {
             var model = _userRepository.Get(id);
