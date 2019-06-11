@@ -66,7 +66,7 @@ namespace PlanRestApi.Controllers
             {
                 var result = _typePlanRepository.Insert(type);
                 var lastType = result ? _typePlanRepository.GetLastInserted() : null;
-                var uri = Url.Action("Get", new { id = lastType.Id });
+                var uri = Url.Action("Get", new { id = lastType.Id, Version = "1.0" });
                 return Created(uri, lastType);
             }
             return BadRequest();
